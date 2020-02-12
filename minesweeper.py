@@ -1,4 +1,4 @@
-import pygame
+import pygame#SEARCH FOR "HERES" and print
 import sys
 import time
 import random
@@ -115,6 +115,99 @@ coverField = [
 [0,0,0,0,0,0,0,0,0],
 ]
 
+def initiateGame():
+	global ROWS
+	global COLUMNS
+	global bombCount
+	global TILE_SIZE
+	global MARGIN
+	global WIN_WIDTH
+	global WIN_HEIGHT
+	global backgroud_colour
+	global gameDisplay
+	global clock
+	global cursorEvent
+	global gameOver
+	global coverImg
+	global bombImg
+	global blankImg
+	global flagImg
+	global mineField
+	global touchingField
+	global coverField
+
+	#variables
+	ROWS = 9
+	COLUMNS = 9
+	bombCount = 10
+	TILE_SIZE = 16
+	MARGIN = TILE_SIZE
+	WIN_WIDTH = MARGIN + COLUMNS * TILE_SIZE + MARGIN
+	WIN_HEIGHT = MARGIN + MARGIN + ROWS * TILE_SIZE + MARGIN
+	backgroud_colour = (255,255,255)
+
+	#set up mouse events
+	cursorEvent = pygame.event.poll()
+
+	#set up window icon
+	#logo = pygame.image.load("Media/icon.png")
+	#pygame.display.set_icon(logo)
+
+	#game starts
+	gameOver = False
+
+	#load images
+	coverImg = pygame.image.load("Media/block16.jpg")
+	bombImg = pygame.image.load("Media/bomb16.jpg")
+	blankImg = pygame.image.load("Media/blank16.jpg")
+	flagImg = pygame.image.load("Media/flag16.jpg")
+
+	mineField = [
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	]
+	touchingField = [
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	]
+
+	coverField = [
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0],
+	]
+
+	print("Restated each variables")
+
+	placeBombs()
+
+	for blockY in range(ROWS):
+
+			for blockX in range(COLUMNS):
+
+				searchSurrounding(blockX, blockY)
+	gameLoop()
+
 def placeBombs():
 
 	tempBombCount = 0
@@ -135,6 +228,7 @@ def placeBombs():
 
 			if mineField[checkY][checkX] == 1:
 				tempBombCount+=1
+				#print("placed a bomb")
 
 	#restart function until there are enough bombs
 	if tempBombCount < bombCount:
@@ -253,7 +347,9 @@ def bombBlock(arrayCol, arrayRow, touchingBombs):
 	elif blockType == "bomb" and coverField[arrayRow][arrayCol] == 1:
 		gameDisplay.blit(bombImg, (blockX, blockY))
 		
-def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton, touchingBombs):
+def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
+
+	global gameOver
 
 	blockX = arrayCol * TILE_SIZE
 	blockY = arrayRow * TILE_SIZE
@@ -279,8 +375,9 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton, touchingBombs):
 					testSurrounding(arrayCol, arrayRow)
 
 					if mineField[arrayRow][arrayCol] == 1:
-						pygame.quit()
-						quit()
+						#pygame.quit()
+						#quit()
+						gameOver = "True"
 						"""HERE: DRAWs over 1's and cannot undo flag"""
 
 	if liftedMouse == True and mouseButton == "Right":
@@ -336,7 +433,7 @@ def bombSearch(blockX,blockY):
 
 	return touchingBombs
 	
-def searchSurroinding(blockX,blockY):
+def searchSurrounding(blockX,blockY):
 
 	if mineField[blockY-1][blockX-1] == 1 and blockY > 0 and blockX > 0:
 		touchingField[blockY][blockX] += 1
@@ -359,9 +456,9 @@ for blockY in range(ROWS):
 
 		for blockX in range(COLUMNS):
 
-			searchSurroinding(blockX, blockY)
+			searchSurrounding(blockX, blockY)
 
-print(touchingField)
+#print(touchingField)
 
 def processAllCells(mouseStatus, whichMouseButton):
 
@@ -369,11 +466,28 @@ def processAllCells(mouseStatus, whichMouseButton):
 
 		for blockX in range(COLUMNS):
 
-			coverBlock(blockX, blockY, mouseStatus, whichMouseButton, bombSearch(blockX, blockY))
+			coverBlock(blockX, blockY, mouseStatus, whichMouseButton)
 			bombBlock(blockX, blockY, bombSearch(blockX, blockY))
-			
+	
+def uncoverBombs():
+
+	global COLUMNS
+	global ROWS
+
+	#processAllCells(False, False)
+	"""for blockY in range(ROWS):
+		for blockX in range(COLUMNS):
+			if mineField[blockY][blockX] == 1:
+				gameDisplay.blit(blankImg, (blockX, blockY))"""
+	for blockY in range(ROWS):
+		for blockX in range(COLUMNS):
+			if mineField[blockY][blockX] == 1:
+				coverField[blockY][blockX] = 1
+				bombBlock(blockX, blockY, bombSearch(blockX, blockY))
 
 def gameLoop():
+
+	global gameOver
 
 	while not gameOver: 
 
@@ -388,19 +502,19 @@ def gameLoop():
 				quit()
 
 			"""if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-			    #None
+			    
 			    liftedMouse = False
 			    mouseButton = "Left"
 
 			 """
 
 			if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-			    #None
+			    
 			    liftedMouse = True
 			    mouseButton = "Left"
 
 			elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
-			    #None
+			    
 			    liftedMouse = True
 			    mouseButton = "Right"
 
@@ -416,8 +530,61 @@ def gameLoop():
 
 		clock.tick(60)
 
+	while gameOver: 
+
+		for blockY in range(9):
+			for blockX in range(9):
+			    uncoverBombs()
+
+		#liftedMouse = False
+		#mouseButton = "Left"
+
+		for event in pygame.event.get():
+
+			if event.type == pygame.QUIT:
+				#gameOver = True
+				pygame.quit()
+				quit()
+
+			"""if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+			    
+			    liftedMouse = False
+			    mouseButton = "Left"
+
+			 """
+
+			#if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+			    
+			    #liftedMouse = True
+			    #mouseButton = "Left"
+
+			#elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
+			    
+			    #liftedMouse = True
+			    #mouseButton = "Right"
+
+			#processAllCells(liftedMouse, mouseButton)
+			    
+			if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+			    
+			    print("Restarting program")
+			    #pygame.init()
+			    initiateGame()
+			    #processAllCells(False, False)
+			    #liftedMouse = True
+			    #mouseButton = "Left"
+
+		#gameDisplay.blit(backgroundImg, (WIN_WIDTH-WIN_WIDTH, WIN_HEIGHT-WIN_HEIGHT))
+		#blockCover = True
+
+		pygame.display.update()
+
+		#pygame.event.wait()
+
+		clock.tick(60)
+
 gameLoop()
 
-pygame.display.quit()
-pygame.quit()
-quit()
+#pygame.display.quit()
+#pygame.quit()
+#quit()
