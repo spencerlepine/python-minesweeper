@@ -1,9 +1,10 @@
-import pygame#SEARCH FOR "HERES" and print
+import pygame
 import sys
 import time
 import random
 #started on ‎Tuesday, ‎July ‎16, ‎2019, ‏‎3:28:13 PM"
 
+#TO-DO ------------------------------------------------------------
 #clean up code and label/explain stuff
 #add clicks and dissiapearing covers
 #automatically change touching block if clicked
@@ -12,6 +13,8 @@ import random
 
 #draw seperate cover on top with flag and breakbable boolean
 #alwasy draw the bombs under
+#SEARCH FOR "HERES" and print + MAKe banner with epic epxlosions
+#-------------------------------------------------------------------
 
 #initiate program
 pygame.init()
@@ -22,8 +25,10 @@ COLUMNS = 9
 bombCount = 10
 TILE_SIZE = 16
 MARGIN = TILE_SIZE
-WIN_WIDTH = MARGIN + COLUMNS * TILE_SIZE + MARGIN
-WIN_HEIGHT = MARGIN + MARGIN + ROWS * TILE_SIZE + MARGIN
+PADDING = 9
+X_PADDING = 8
+WIN_WIDTH = MARGIN + (COLUMNS) * TILE_SIZE
+WIN_HEIGHT = MARGIN + MARGIN + ((ROWS) * TILE_SIZE) + MARGIN + PADDING
 backgroud_colour = (255,255,255)
 
 #set up the game window
@@ -48,13 +53,22 @@ cursorEvent = pygame.event.poll()
 #game starts
 gameOver = False
 
+smileState = "Game"
+
 #load images
 coverImg = pygame.image.load("Media/block16.jpg")
 bombImg = pygame.image.load("Media/bomb16.jpg")
 blankImg = pygame.image.load("Media/blank16.jpg")
 flagImg = pygame.image.load("Media/flag16.jpg")
+smileUpImg = pygame.image.load("Media/smile-up.jpg")
+smileDownImg = pygame.image.load("Media/smile-down.jpg")
+smileOhNoImg = pygame.image.load("Media/smile-ohno.jpg")
+smileDeadImg = pygame.image.load("Media/smile-dead.jpg")
+smileCoolImg = pygame.image.load("Media/smile-cool.jpg")
+bombsImg = pygame.image.load("Media/bombs.jpg")
+timesImg = pygame.image.load("Media/time.jpg")
 
-#backgroundImg = pygame.image.load("Media/background.png")
+backgroundImg = pygame.image.load("Media/screenoutline.png")
 
 #MAX W and H is 16x30
 """mineField = [
@@ -115,7 +129,7 @@ coverField = [
 [0,0,0,0,0,0,0,0,0],
 ]
 
-def initiateGame():
+def initializeGame():
 	global ROWS
 	global COLUMNS
 	global bombCount
@@ -135,16 +149,17 @@ def initiateGame():
 	global mineField
 	global touchingField
 	global coverField
+	global smileState
 
 	#variables
 	ROWS = 9
 	COLUMNS = 9
 	bombCount = 10
-	TILE_SIZE = 16
-	MARGIN = TILE_SIZE
-	WIN_WIDTH = MARGIN + COLUMNS * TILE_SIZE + MARGIN
-	WIN_HEIGHT = MARGIN + MARGIN + ROWS * TILE_SIZE + MARGIN
-	backgroud_colour = (255,255,255)
+	#TILE_SIZE = 16
+	#MARGIN = TILE_SIZE
+	#WIN_WIDTH = MARGIN + COLUMNS * TILE_SIZE + MARGIN
+	#WIN_HEIGHT = MARGIN + MARGIN + ROWS * TILE_SIZE + MARGIN
+	#backgroud_colour = (255,255,255)
 
 	#set up mouse events
 	cursorEvent = pygame.event.poll()
@@ -155,12 +170,13 @@ def initiateGame():
 
 	#game starts
 	gameOver = False
+	smileState = "Game"
 
-	#load images
+	"""#load images DO I NEED THESE?
 	coverImg = pygame.image.load("Media/block16.jpg")
 	bombImg = pygame.image.load("Media/bomb16.jpg")
 	blankImg = pygame.image.load("Media/blank16.jpg")
-	flagImg = pygame.image.load("Media/flag16.jpg")
+	flagImg = pygame.image.load("Media/flag16.jpg")"""
 
 	mineField = [
 	[0,0,0,0,0,0,0,0,0],
@@ -299,8 +315,8 @@ def bombBlock(arrayCol, arrayRow, touchingBombs):
 	blockY = arrayRow * TILE_SIZE
 
 	#center game grid
-	blockX+=MARGIN
-	blockY+=MARGIN*2
+	blockX+=X_PADDING
+	blockY+=MARGIN*2 + PADDING*2
 
 	blockType = "blank"
 
@@ -350,13 +366,14 @@ def bombBlock(arrayCol, arrayRow, touchingBombs):
 def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 
 	global gameOver
+	global smileState
 
 	blockX = arrayCol * TILE_SIZE
 	blockY = arrayRow * TILE_SIZE
 
 	#center game grid
-	blockX+=MARGIN
-	blockY+=MARGIN*2
+	blockX+=X_PADDING
+	blockY+= PADDING*2 + MARGIN*2
 
 	#if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 	mouseX, mouseY = pygame.mouse.get_pos()
@@ -402,6 +419,55 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 
 	if coverField[arrayRow][arrayCol] == 2:
 		gameDisplay.blit(flagImg, (blockX, blockY))
+
+def processSmiley(mouseDown, liftedMouse, smileState):
+
+	smileImgX = ((WIN_WIDTH / 2) - (26/2))
+	smileImgY = ((MARGIN) - (26/2)) + PADDING
+
+	mouseX, mouseY = pygame.mouse.get_pos()
+
+	#if mouseState == True:
+	#Down
+	#OhNo
+	#Game
+
+	if liftedMouse:
+		
+		if mouseX > smileImgX and mouseX < smileImgX + 26:
+
+			if mouseY > smileImgY and mouseY < smileImgY + 26:
+
+				gameOver = True
+				initializeGame()
+
+	if mouseDown:
+
+		if mouseX > smileImgX and mouseX < smileImgX + 26:
+
+			if mouseY > smileImgY and mouseY < smileImgY + 26:
+
+				gameDisplay.blit(smileDownImg, ((smileImgX), (smileImgY)))
+	
+	elif smileState == "Game":
+
+		gameDisplay.blit(smileUpImg, ((smileImgX), (smileImgY)))
+
+
+	elif smileState == "Down":
+
+		gameDisplay.blit(smileDownImg, ((smileImgX), (smileImgY)))
+
+	elif smileState == "OhNo":
+
+		gameDisplay.blit(smileOhNoImg, ((smileImgX), (smileImgY)))
+
+	elif smileState == "Dead":
+
+		gameDisplay.blit(smileDeadImg, ((smileImgX), (smileImgY)))
+
+	#else:
+		#gameDisplay.blit(smileUpImg, ((WIN_WIDTH / 2) - (26/2), (MARGIN) - (26/2)))
 
 def bombSearch(blockX,blockY):
 
@@ -488,11 +554,18 @@ def uncoverBombs():
 def gameLoop():
 
 	global gameOver
+	global smileState
+	mouseX, mouseY = pygame.mouse.get_pos()#MAKE GLOBAL
+	"""smileImgX = ((WIN_WIDTH / 2) - (26/2))
+	smileImgY = ((MARGIN) - (26/2))
+
+	mouseX, mouseY = pygame.mouse.get_pos()"""
 
 	while not gameOver: 
 
 		liftedMouse = False
 		mouseButton = "Left"
+		mouseDown = False
 
 		for event in pygame.event.get():
 
@@ -507,11 +580,16 @@ def gameLoop():
 			    mouseButton = "Left"
 
 			 """
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+				mouseDown = True
+				smileState = "OhNo"
 
 			if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 			    
 			    liftedMouse = True
 			    mouseButton = "Left"
+			    smileState = "Game"
 
 			elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
 			    
@@ -519,9 +597,9 @@ def gameLoop():
 			    mouseButton = "Right"
 
 			processAllCells(liftedMouse, mouseButton)
-			    
+			processSmiley(mouseDown, liftedMouse, smileState)    
 
-		#gameDisplay.blit(backgroundImg, (WIN_WIDTH-WIN_WIDTH, WIN_HEIGHT-WIN_HEIGHT))
+		gameDisplay.blit(backgroundImg, (0, 0))
 		#blockCover = True
 
 		pygame.display.update()
@@ -531,13 +609,15 @@ def gameLoop():
 		clock.tick(60)
 
 	while gameOver: 
+		
+		liftedMouse = False
+		smileState = "Dead"
+		smileImgX = ((WIN_WIDTH / 2) - (26/2))
+		smileImgY = ((MARGIN) - (26/2)) + PADDING
 
 		for blockY in range(9):
 			for blockX in range(9):
 			    uncoverBombs()
-
-		#liftedMouse = False
-		#mouseButton = "Left"
 
 		for event in pygame.event.get():
 
@@ -546,40 +626,33 @@ def gameLoop():
 				pygame.quit()
 				quit()
 
-			"""if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-			    
-			    liftedMouse = False
-			    mouseButton = "Left"
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 
-			 """
+				if mouseX > smileImgX and mouseX < smileImgX + 26:
 
-			#if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-			    
-			    #liftedMouse = True
-			    #mouseButton = "Left"
+					if mouseY > smileImgY and mouseY < smileImgY + 26:
+						
+						mouseDown = True
+						smileState = "Down"
 
-			#elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
-			    
-			    #liftedMouse = True
-			    #mouseButton = "Right"
-
-			#processAllCells(liftedMouse, mouseButton)
-			    
 			if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 			    
-			    print("Restarting program")
-			    #pygame.init()
-			    initiateGame()
-			    #processAllCells(False, False)
-			    #liftedMouse = True
-			    #mouseButton = "Left"
+			    liftedMouse = True
 
-		#gameDisplay.blit(backgroundImg, (WIN_WIDTH-WIN_WIDTH, WIN_HEIGHT-WIN_HEIGHT))
-		#blockCover = True
+			    """if mouseX > smileImgX and mouseX < smileImgX + 26:
+
+			    	if mouseY > smileImgY and mouseY < smileImgY + 26:
+			    		initializeGame()"""
+
+			processSmiley(mouseDown, liftedMouse, smileState)
+			    
+			#if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+			    
+			    #print("Restarting program")
+			    #initializeGame()
 
 		pygame.display.update()
 
-		#pygame.event.wait()
 
 		clock.tick(60)
 
