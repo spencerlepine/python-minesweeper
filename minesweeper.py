@@ -2,6 +2,7 @@ import pygame
 import sys
 import time
 import random
+import math
 #started on ‎Tuesday, ‎July ‎16, ‎2019, ‏‎3:28:13 PM"
 
 #TO-DO ------------------------------------------------------------
@@ -14,6 +15,7 @@ import random
 #draw seperate cover on top with flag and breakbable boolean
 #alwasy draw the bombs under
 #SEARCH FOR "HERES" and print + MAKe banner with epic epxlosions
+#change X-PADDING to just padding in code
 #-------------------------------------------------------------------
 
 #initiate program
@@ -23,11 +25,12 @@ pygame.init()
 ROWS = 9
 COLUMNS = 9
 bombCount = 10
+flagsPlaced = 0
 TILE_SIZE = 16
 MARGIN = TILE_SIZE
-PADDING = 9
-X_PADDING = 8
-WIN_WIDTH = MARGIN + (COLUMNS) * TILE_SIZE
+PADDING = 10
+X_PADDING = 10
+WIN_WIDTH = PADDING + (COLUMNS) * TILE_SIZE + PADDING
 WIN_HEIGHT = MARGIN + MARGIN + ((ROWS) * TILE_SIZE) + MARGIN + PADDING
 backgroud_colour = (255,255,255)
 
@@ -67,6 +70,18 @@ smileDeadImg = pygame.image.load("Media/smile-dead.jpg")
 smileCoolImg = pygame.image.load("Media/smile-cool.jpg")
 bombsImg = pygame.image.load("Media/bombs.jpg")
 timesImg = pygame.image.load("Media/time.jpg")
+
+oneImg = pygame.image.load("Media/one.jpg")
+twoImg = pygame.image.load("Media/two.jpg")
+threeImg = pygame.image.load("Media/three.jpg")
+fourImg = pygame.image.load("Media/four.jpg")
+fiveImg = pygame.image.load("Media/five.jpg")
+sixImg = pygame.image.load("Media/six.jpg")
+sevenImg = pygame.image.load("Media/seven.jpg")
+eightImg = pygame.image.load("Media/eight.jpg")
+nineImg = pygame.image.load("Media/nine.jpg")
+zeroImg = pygame.image.load("Media/zero.jpg")
+zipImg = pygame.image.load("Media/zip.jpg")
 
 backgroundImg = pygame.image.load("Media/screenoutline.png")
 
@@ -150,11 +165,14 @@ def initializeGame():
 	global touchingField
 	global coverField
 	global smileState
+	global flagsPlaced
 
 	#variables
 	ROWS = 9
 	COLUMNS = 9
 	bombCount = 10
+
+	flagsPlaced = 0
 	#TILE_SIZE = 16
 	#MARGIN = TILE_SIZE
 	#WIN_WIDTH = MARGIN + COLUMNS * TILE_SIZE + MARGIN
@@ -189,6 +207,7 @@ def initializeGame():
 	[0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,0,0,0,0],
 	]
+
 	touchingField = [
 	[0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,0,0,0,0],
@@ -213,7 +232,7 @@ def initializeGame():
 	[0,0,0,0,0,0,0,0,0],
 	]
 
-	print("Restated each variables")
+	print("Restated variables")
 
 	placeBombs()
 
@@ -258,14 +277,29 @@ def textObjects(text, font, color):
 	return textSurface, textSurface.get_rect()
 
 #display a message function
-def textDisplay(text, x, y, color):
-	#numberText = pygame.font.Font("freesansbold.ttf", round(TILE_SIZE/2))
-	#numberText = pygame.font.Font("Media/digit-7-mono.ttf", round((TILE_SIZE/8)*7))
-	numberText = pygame.font.Font("Media/minesweeper.ttf", round(TILE_SIZE*(2/3)))
-	textSurf, textRect = textObjects(text, numberText, color)
-	#center the text
-	textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
-	gameDisplay.blit(textSurf, textRect)
+def textDisplay(text, x, y, color, type):
+
+	if type == "Block":
+
+		#numberText = pygame.font.Font("freesansbold.ttf", round(TILE_SIZE/2))
+		#numberText = pygame.font.Font("Media/digit-7-mono.ttf", round((TILE_SIZE/8)*7))
+		numberText = pygame.font.Font("Media/minesweeper.ttf", round(TILE_SIZE*(2/3)))
+		textSurf, textRect = textObjects(text, numberText, color)
+		#center the text
+		textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
+		gameDisplay.blit(textSurf, textRect)
+
+	elif type == "Digital": 
+
+		fontSize = 28
+		#numberText = pygame.font.Font("freesansbold.ttf", round(TILE_SIZE/2))
+		#numberText = pygame.font.Font("Media/digit-7-mono.ttf", round((TILE_SIZE/8)*7))
+		numberText = pygame.font.Font("Media/digit-7-mono.ttf", fontSize)
+		textSurf, textRect = textObjects(text, numberText, color)
+		#center the text
+		#textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
+		textRect.center = (x, y + 10)
+		gameDisplay.blit(textSurf, textRect)
 
 def testSurrounding(cellColumn, cellRow):
 	#cellColumn, cellRow is the whole number of the array
@@ -358,7 +392,7 @@ def bombBlock(arrayCol, arrayRow, touchingBombs):
 		gameDisplay.blit(blankImg, (blockX, blockY))
 
 		if touchingBombsLabel != "0" and coverField[arrayRow][arrayCol] == 1:
-			textDisplay(touchingBombsLabel, blockX, blockY, labelColor)
+			textDisplay(touchingBombsLabel, blockX, blockY, labelColor, "Block")
 
 	elif blockType == "bomb" and coverField[arrayRow][arrayCol] == 1:
 		gameDisplay.blit(bombImg, (blockX, blockY))
@@ -367,6 +401,7 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 
 	global gameOver
 	global smileState
+	global flagsPlaced
 
 	blockX = arrayCol * TILE_SIZE
 	blockY = arrayRow * TILE_SIZE
@@ -406,10 +441,12 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 				if coverField[arrayRow][arrayCol] == 0:
 					#print("Flaggeded cell: (" + str(arrayCol + 1) + ", " + str(arrayRow + 1) + ")")
 					coverField[arrayRow][arrayCol] = 2
+					flagsPlaced+=1
 
 				elif coverField[arrayRow][arrayCol] == 2:
 					#print("Flaggeded cell: (" + str(arrayCol + 1) + ", " + str(arrayRow + 1) + ")")
 					coverField[arrayRow][arrayCol] = 0
+					flagsPlaced-=1
 
 	#if liftedMouse < 0:
 		#testMouse()
@@ -468,6 +505,124 @@ def processSmiley(mouseDown, liftedMouse, smileState):
 
 	#else:
 		#gameDisplay.blit(smileUpImg, ((WIN_WIDTH / 2) - (26/2), (MARGIN) - (26/2)))
+
+def decideDig(place):
+
+	global bombCount
+	global flagsPlaced
+
+	uncovered = bombCount - flagsPlaced
+	print(uncovered)
+
+	number = 0
+
+	if place == 1:
+
+		if uncovered < 0:
+			
+			uncovered*=-1
+
+			if uncovered < -99:
+
+				number = 9
+
+		number = uncovered - ((math.floor(uncovered / 10 )) * 10)
+
+	elif place == 2:
+
+		number = math.floor((uncovered - (math.floor(uncovered / 100)) * 100 ) / 10)	
+
+		if uncovered < 0:
+
+			number = math.floor(((uncovered*-1) - (math.floor((uncovered*-1) / 100)) * 100 ) / 10)
+
+			#if uncovered > -10:
+
+				#number = -1
+
+			if uncovered < -99:
+
+				number = 9
+
+	elif place == 3:
+
+		number = math.floor((uncovered - (math.floor(uncovered / 1000)) * 1000 ) / 100)
+
+		if uncovered < 0:
+
+			number = math.floor(((uncovered*-1) - (math.floor((uncovered*-1) / 1000)) * 1000 ) / 100)
+
+			#if uncovered < 0:
+
+			number = -1
+
+	#number = str(round(number))
+	if number == 0:
+
+		return zeroImg
+
+	elif number == 1:
+
+		return oneImg
+
+	elif number == 2:
+
+		return twoImg
+
+	elif number == 3:
+
+		return threeImg
+
+	elif number == 4:
+
+		return fourImg
+
+	elif number == 5:
+
+		return fiveImg
+
+	elif number == 6:
+
+		return sixImg
+
+	elif number == 7:
+
+		return sevenImg
+
+	elif number == 8:
+
+		return eightImg
+
+	elif number == 9:
+
+		return nineImg
+	
+	elif number == -1:
+
+		return zipImg
+
+def processBombCount():
+
+	global flagsPlaced
+	global bombCount
+
+	bombCountX = PADDING + 4
+	bombCountY = PADDING + 6
+	digit = 13
+
+	DIGIT1 = 1
+	#digit 1
+	gameDisplay.blit(decideDig(1), (bombCountX + digit*2, bombCountY))
+	#digit 2
+	gameDisplay.blit(decideDig(2), (bombCountX + digit, bombCountY))
+	#digit 3
+	gameDisplay.blit(decideDig(3), (bombCountX, bombCountY))
+	#print(decideDig(3, flagsPlaced))
+	#textDisplay(str(bombCount - flagsPlaced), blockX, blockY, (0,0,0), "Digital")
+
+def processTimer():
+
+	global smileState
 
 def bombSearch(blockX,blockY):
 
@@ -534,7 +689,9 @@ def processAllCells(mouseStatus, whichMouseButton):
 
 			coverBlock(blockX, blockY, mouseStatus, whichMouseButton)
 			bombBlock(blockX, blockY, bombSearch(blockX, blockY))
-	
+
+	processBombCount()
+
 def uncoverBombs():
 
 	global COLUMNS
