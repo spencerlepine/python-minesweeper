@@ -16,6 +16,7 @@ import math
 #alwasy draw the bombs under
 #SEARCH FOR "HERES" and print + MAKe banner with epic epxlosions
 #change X-PADDING to just padding in code
+#remove dash in readme title
 #-------------------------------------------------------------------
 
 #initiate program
@@ -41,6 +42,7 @@ gameDisplay = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption('Minesweeper')
 
 #set up important clock
+timeElapsed = 0
 clock = pygame.time.Clock()
 
 #draw backgrond onto the screen
@@ -68,7 +70,7 @@ smileDownImg = pygame.image.load("Media/smile-down.jpg")
 smileOhNoImg = pygame.image.load("Media/smile-ohno.jpg")
 smileDeadImg = pygame.image.load("Media/smile-dead.jpg")
 smileCoolImg = pygame.image.load("Media/smile-cool.jpg")
-bombsImg = pygame.image.load("Media/bombs.jpg")
+#bombsImg = pygame.image.load("Media/bomb16s.jpg")
 timesImg = pygame.image.load("Media/time.jpg")
 
 oneImg = pygame.image.load("Media/one.jpg")
@@ -166,6 +168,7 @@ def initializeGame():
 	global coverField
 	global smileState
 	global flagsPlaced
+	global timeElapsed
 
 	#variables
 	ROWS = 9
@@ -185,6 +188,8 @@ def initializeGame():
 	#set up window icon
 	#logo = pygame.image.load("Media/icon.png")
 	#pygame.display.set_icon(logo)
+
+	timeElapsed = 0
 
 	#game starts
 	gameOver = False
@@ -289,7 +294,7 @@ def textDisplay(text, x, y, color, type):
 		textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
 		gameDisplay.blit(textSurf, textRect)
 
-	elif type == "Digital": 
+	"""elif type == "Digital": 
 
 		fontSize = 28
 		#numberText = pygame.font.Font("freesansbold.ttf", round(TILE_SIZE/2))
@@ -299,7 +304,7 @@ def textDisplay(text, x, y, color, type):
 		#center the text
 		#textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
 		textRect.center = (x, y + 10)
-		gameDisplay.blit(textSurf, textRect)
+		gameDisplay.blit(textSurf, textRect)"""
 
 def testSurrounding(cellColumn, cellRow):
 	#cellColumn, cellRow is the whole number of the array
@@ -506,53 +511,52 @@ def processSmiley(mouseDown, liftedMouse, smileState):
 	#else:
 		#gameDisplay.blit(smileUpImg, ((WIN_WIDTH / 2) - (26/2), (MARGIN) - (26/2)))
 
-def decideDig(place):
+def decideDig(place, score):
 
 	global bombCount
 	global flagsPlaced
 
-	uncovered = bombCount - flagsPlaced
-	print(uncovered)
+	#print(score)
 
 	number = 0
 
 	if place == 1:
 
-		if uncovered < 0:
+		if score < 0:
 			
-			uncovered*=-1
+			score*=-1
 
-			if uncovered < -99:
+			if score < -99:
 
 				number = 9
 
-		number = uncovered - ((math.floor(uncovered / 10 )) * 10)
+		number = score - ((math.floor(score / 10 )) * 10)
 
 	elif place == 2:
 
-		number = math.floor((uncovered - (math.floor(uncovered / 100)) * 100 ) / 10)	
+		number = math.floor((score - (math.floor(score / 100)) * 100 ) / 10)	
 
-		if uncovered < 0:
+		if score < 0:
 
-			number = math.floor(((uncovered*-1) - (math.floor((uncovered*-1) / 100)) * 100 ) / 10)
+			number = math.floor(((score*-1) - (math.floor((score*-1) / 100)) * 100 ) / 10)
 
-			#if uncovered > -10:
+			#if score > -10:
 
 				#number = -1
 
-			if uncovered < -99:
+			if score < -99:
 
 				number = 9
 
 	elif place == 3:
 
-		number = math.floor((uncovered - (math.floor(uncovered / 1000)) * 1000 ) / 100)
+		number = math.floor((score - (math.floor(score / 1000)) * 1000 ) / 100)
 
-		if uncovered < 0:
+		if score < 0:
 
-			number = math.floor(((uncovered*-1) - (math.floor((uncovered*-1) / 1000)) * 1000 ) / 100)
+			number = math.floor(((score*-1) - (math.floor((score*-1) / 1000)) * 1000 ) / 100)
 
-			#if uncovered < 0:
+			#if score < 0:
 
 			number = -1
 
@@ -608,21 +612,36 @@ def processBombCount():
 
 	bombCountX = PADDING + 4
 	bombCountY = PADDING + 6
-	digit = 13
+	digitSpacing = 13
+	uncovered = bombCount - flagsPlaced
 
-	DIGIT1 = 1
 	#digit 1
-	gameDisplay.blit(decideDig(1), (bombCountX + digit*2, bombCountY))
+	gameDisplay.blit(decideDig(1, uncovered), (bombCountX + digitSpacing*2, bombCountY))
 	#digit 2
-	gameDisplay.blit(decideDig(2), (bombCountX + digit, bombCountY))
+	gameDisplay.blit(decideDig(2, uncovered), (bombCountX + digitSpacing, bombCountY))
 	#digit 3
-	gameDisplay.blit(decideDig(3), (bombCountX, bombCountY))
+	gameDisplay.blit(decideDig(3, uncovered), (bombCountX, bombCountY))
 	#print(decideDig(3, flagsPlaced))
 	#textDisplay(str(bombCount - flagsPlaced), blockX, blockY, (0,0,0), "Digital")
 
 def processTimer():
 
-	global smileState
+	global timeElapsed
+	seconds = round(timeElapsed / 1000)
+
+	#secondsElapsed = int(round(pygame.time.get_ticks()/1000))
+	digitSpacing = 13
+	timerX = WIN_WIDTH - PADDING - 4 - (digitSpacing*3)
+	timerY = PADDING + 6
+
+	#digit 1
+	gameDisplay.blit(decideDig(1,seconds), (timerX + digitSpacing*2, timerY))
+	#digit 2
+	gameDisplay.blit(decideDig(2,seconds), (timerX + digitSpacing, timerY))
+	#digit 3
+	gameDisplay.blit(decideDig(3,seconds), (timerX, timerY))
+	#print(decideDig(3, flagsPlaced))
+	#textDisplay(str(timer - flagsPlaced), blockX, blockY, (0,0,0), "Digital")
 
 def bombSearch(blockX,blockY):
 
@@ -691,6 +710,7 @@ def processAllCells(mouseStatus, whichMouseButton):
 			bombBlock(blockX, blockY, bombSearch(blockX, blockY))
 
 	processBombCount()
+	processTimer()
 
 def uncoverBombs():
 
@@ -713,13 +733,17 @@ def gameLoop():
 	global gameOver
 	global smileState
 	mouseX, mouseY = pygame.mouse.get_pos()#MAKE GLOBAL
+
+	global timeElapsed
 	"""smileImgX = ((WIN_WIDTH / 2) - (26/2))
 	smileImgY = ((MARGIN) - (26/2))
 
 	mouseX, mouseY = pygame.mouse.get_pos()"""
+	
 
 	while not gameOver: 
-
+		
+		#timeElapsed+=0.1
 		liftedMouse = False
 		mouseButton = "Left"
 		mouseDown = False
@@ -753,8 +777,8 @@ def gameLoop():
 			    liftedMouse = True
 			    mouseButton = "Right"
 
-			processAllCells(liftedMouse, mouseButton)
-			processSmiley(mouseDown, liftedMouse, smileState)    
+		processAllCells(liftedMouse, mouseButton)
+		processSmiley(mouseDown, liftedMouse, smileState)    
 
 		gameDisplay.blit(backgroundImg, (0, 0))
 		#blockCover = True
@@ -762,8 +786,10 @@ def gameLoop():
 		pygame.display.update()
 
 		#pygame.event.wait()
-
+		
 		clock.tick(60)
+		timeElapsed+=16.66676
+		print(str(round(timeElapsed/1000)) + " --- " + str(int(round(pygame.time.get_ticks()/1000))))
 
 	while gameOver: 
 		
@@ -783,12 +809,13 @@ def gameLoop():
 				pygame.quit()
 				quit()
 
-			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+			
 
-				if mouseX > smileImgX and mouseX < smileImgX + 26:
+			if mouseX > smileImgX and mouseX < smileImgX + 26:
 
-					if mouseY > smileImgY and mouseY < smileImgY + 26:
-						
+				if mouseY > smileImgY and mouseY < smileImgY + 26:
+					
+					if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 						mouseDown = True
 						smileState = "Down"
 
@@ -810,8 +837,8 @@ def gameLoop():
 
 		pygame.display.update()
 
-
 		clock.tick(60)
+
 
 gameLoop()
 
