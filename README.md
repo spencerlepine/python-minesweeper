@@ -1,7 +1,7 @@
-# Python-Minesweeper
-A recreation of the classic Minesweeper with Pygame, coded in python.
-I used pygame 1.9.4 for this project.
+# Python Minesweeper
+Recreation of the classic Minesweeper game using Pygame
 
-I had some troubles when I was programming the game. I was only using local variables and midly confused, since I hadn't yet learned what a global variable was.
-Another issue I had was uncovering multiplel blocks at once. When you click a blank spot to uncover it, all of the surrounding blank spots should automatically uncover as well. I approached this by testing every block surrounding, each time the player clicks. This was very slow, so I created a new system. When the game started a pool field would be generated, based on the spots with no bombs nearby. This would be faster with a predetermined amount of spots to uncover.
+*Required:* Set up PyGame to run the code: https://stackoverflow.com/questions/28453854/add-pygame-module-in-pycharm-id
+
+Troubles: 1) Only using local variables, had not learned what a global variable was at beginning. 2) The most difficult issue; uncovering multiple blocks at once (smoothly). My initial approach was to test surrounding blocks in daimond layers (up, down, left, right) outwards recursively, stopping before uncovering a bomb. This worked, but it was processing much to slowly to be functional. I took a break from this project after struggling to solve this problem. Later, when I began to work on other game mechanics, I added a timer. The timer needs to update regardless of user input, so it needed to be run in the 'while not gameOver' loop. That was the solution for uncovering the blocks: constantly update the cover blocks in the game loop. The blocks were uncovering slowly becuase it only updated if the cursor was being moved during the 'for event in pygame.event.get()'.
 

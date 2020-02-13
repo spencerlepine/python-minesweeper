@@ -5,6 +5,7 @@ import random
 import math
 #started on ‎Tuesday, ‎July ‎16, ‎2019, ‏‎3:28:13 PM"
 
+#https://www.reddit.com/r/SublimeText/comments/2mwb8u/quick_tip_sublime_text_clipboard_copy_paste/
 #TO-DO ------------------------------------------------------------
 #clean up code and label/explain stuff
 #add clicks and dissiapearing covers
@@ -246,6 +247,7 @@ def initializeGame():
 			for blockX in range(COLUMNS):
 
 				searchSurrounding(blockX, blockY)
+
 	gameLoop()
 
 def placeBombs():
