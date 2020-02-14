@@ -18,6 +18,9 @@ import math
 #SEARCH FOR "HERES" and print + MAKe banner with epic epxlosions
 #change X-PADDING to just padding in code
 #remove dash in readme title
+#TEST CORNERS FOR LAYERING THING, leaving some baLNK
+#automatic flag if you win like 1 bomb?
+#fix flag image
 #-------------------------------------------------------------------
 
 #initiate program
@@ -26,7 +29,7 @@ pygame.init()
 #variables
 ROWS = 9
 COLUMNS = 9
-bombCount = 10
+bombCount = 2
 flagsPlaced = 0
 TILE_SIZE = 16
 MARGIN = TILE_SIZE
@@ -64,6 +67,8 @@ smileState = "Game"
 #load images
 coverImg = pygame.image.load("Media/block16.jpg")
 bombImg = pygame.image.load("Media/bomb16.jpg")
+endBombImg = pygame.image.load("Media/endbomb.jpg")
+noBombImg = pygame.image.load("Media/nobomb.jpg")
 blankImg = pygame.image.load("Media/blank16.jpg")
 flagImg = pygame.image.load("Media/flag16.jpg")
 smileUpImg = pygame.image.load("Media/smile-up.jpg")
@@ -174,7 +179,7 @@ def initializeGame():
 	#variables
 	ROWS = 9
 	COLUMNS = 9
-	bombCount = 10
+	bombCount = 2#HERE PROBSBLY DON'T NEED
 
 	flagsPlaced = 0
 	#TILE_SIZE = 16
@@ -409,6 +414,8 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 	global gameOver
 	global smileState
 	global flagsPlaced
+	global ROWS
+	global COLUMNS
 
 	blockX = arrayCol * TILE_SIZE
 	blockY = arrayRow * TILE_SIZE
@@ -435,8 +442,21 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 
 					if mineField[arrayRow][arrayCol] == 1:
 						#pygame.quit()
-						#quit()
+
+						coverField[arrayRow][arrayCol] = 3
+						print("change to redde")
+
+						for bY in range(ROWS):
+
+							for bX in range(COLUMNS):
+
+								if coverField[bY][bX] == 2 and mineField[bY][bX] == 0:
+
+									coverField[bY][bX] = 4
+									coverBlock(bX, bY, liftedMouse, mouseButton)
+
 						gameOver = "True"
+
 						"""HERE: DRAWs over 1's and cannot undo flag"""
 
 	if liftedMouse == True and mouseButton == "Right":
@@ -459,10 +479,20 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 		#testMouse()
 
 	if coverField[arrayRow][arrayCol] == 0 and coverField[arrayRow][arrayCol] != 1:
+
 		gameDisplay.blit(coverImg, (blockX, blockY))
 
 	if coverField[arrayRow][arrayCol] == 2:
+
 		gameDisplay.blit(flagImg, (blockX, blockY))
+
+	elif coverField[arrayRow][arrayCol] == 3:
+
+		gameDisplay.blit(endBombImg, (blockX, blockY))
+
+	elif coverField[arrayRow][arrayCol] == 4:
+
+		gameDisplay.blit(noBombImg, (blockX, blockY))
 
 def processSmiley(mouseDown, liftedMouse, smileState):
 
@@ -509,6 +539,10 @@ def processSmiley(mouseDown, liftedMouse, smileState):
 	elif smileState == "Dead":
 
 		gameDisplay.blit(smileDeadImg, ((smileImgX), (smileImgY)))
+
+	elif smileState == "Cool":
+
+		gameDisplay.blit(smileCoolImg, ((smileImgX), (smileImgY)))
 
 	#else:
 		#gameDisplay.blit(smileUpImg, ((WIN_WIDTH / 2) - (26/2), (MARGIN) - (26/2)))
@@ -678,21 +712,37 @@ def bombSearch(blockX,blockY):
 def searchSurrounding(blockX,blockY):
 
 	if mineField[blockY-1][blockX-1] == 1 and blockY > 0 and blockX > 0:
+
 		touchingField[blockY][blockX] += 1
+
 	if mineField[blockY-1][blockX] == 1 and blockY > 0:
+
 		touchingField[blockY][blockX] += 1
+
 	if blockX < COLUMNS-1 and mineField[blockY-1][blockX+1] == 1 and blockY > 0:
+
 		touchingField[blockY][blockX] += 1
+
 	if mineField[blockY][blockX-1] == 1 and blockX > 0:
+
 		touchingField[blockY][blockX] += 1		
+
 	if blockX < COLUMNS-1 and mineField[blockY][blockX+1] == 1:
+
 		touchingField[blockY][blockX] += 1		
+
 	if blockY < ROWS-1 and mineField[blockY+1][blockX-1] == 1 and blockX > 1:
+
 		touchingField[blockY][blockX] += 1		
 	if blockY < ROWS-1 and mineField[blockY+1][blockX] == 1 :
-		touchingField[blockY][blockX] += 1		
+
+		touchingField[blockY][blockX] += 1	
+
+
 	if blockY < ROWS-1 and blockX < COLUMNS-1 and mineField[blockY+1][blockX+1] == 1:
+
 		touchingField[blockY][blockX] += 1
+
 
 for blockY in range(ROWS):
 
@@ -700,20 +750,21 @@ for blockY in range(ROWS):
 
 			searchSurrounding(blockX, blockY)
 
-#print(touchingField)
-
 def processAllCells(mouseStatus, whichMouseButton):
+
+	
 
 	for blockY in range(ROWS):
 
 		for blockX in range(COLUMNS):
 
+			checkFlags()
 			coverBlock(blockX, blockY, mouseStatus, whichMouseButton)
 			bombBlock(blockX, blockY, bombSearch(blockX, blockY))
 
 	processBombCount()
 	processTimer()
-
+	
 def uncoverBombs():
 
 	global COLUMNS
@@ -727,9 +778,41 @@ def uncoverBombs():
 	for blockY in range(ROWS):
 		for blockX in range(COLUMNS):
 			if mineField[blockY][blockX] == 1:
-				coverField[blockY][blockX] = 1
-				bombBlock(blockX, blockY, bombSearch(blockX, blockY))
 
+				if coverField[blockY][blockX] < 2:
+
+					coverField[blockY][blockX] = 1
+					bombBlock(blockX, blockY, bombSearch(blockX, blockY))
+
+def checkFlags():
+
+	global bombCount
+	global flagsPlaced
+	global gameOver
+	global smileState
+
+	acceptableFlags = 0
+
+	if bombCount - flagsPlaced == 0:
+
+		for blockY in range(ROWS):
+
+			for blockX in range(COLUMNS):
+
+					if coverField[blockY][blockX] == 2 and mineField[blockY][blockX] == 1:
+
+						acceptableFlags+=1
+
+					#elif coverField[blockY][blockX] == 2 and mineField[blockY][blockX] == 1:
+
+						#coverField[blockY][blockX] == 4
+						#print("changed to 4")
+
+		if acceptableFlags == bombCount:
+
+			smileState = "Cool"
+			gameOver = True
+			
 def gameLoop():
 
 	global gameOver
@@ -791,12 +874,16 @@ def gameLoop():
 		
 		clock.tick(60)
 		timeElapsed+=16.66676
-		print(str(round(timeElapsed/1000)) + " --- " + str(int(round(pygame.time.get_ticks()/1000))))
+		#print(str(round(timeElapsed/1000)) + " --- " + str(int(round(pygame.time.get_ticks()/1000))))
 
 	while gameOver: 
 		
 		liftedMouse = False
-		smileState = "Dead"
+
+		if smileState != "Cool": 
+
+			smileState = "Dead"
+
 		smileImgX = ((WIN_WIDTH / 2) - (26/2))
 		smileImgY = ((MARGIN) - (26/2)) + PADDING
 
@@ -840,7 +927,6 @@ def gameLoop():
 		pygame.display.update()
 
 		clock.tick(60)
-
 
 gameLoop()
 
