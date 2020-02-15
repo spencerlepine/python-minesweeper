@@ -26,7 +26,7 @@ cursorEvent = pygame.event.poll()
 
 #Define game variables.
 gameOver = False
-bombCount = 10
+bombCount = 3
 flagsPlaced = 0
 smileState = "Game"
 
@@ -531,7 +531,7 @@ def uncoverBombs():
 	for blockY in range(ROWS):
 		for blockX in range(COLUMNS):
 			if mineField[blockY][blockX] == 1:
-				if coverField[blockY][blockX] < 2:
+				if coverField[blockY][blockX] == 0:
 					coverField[blockY][blockX] = 1
 					bombBlock(blockX, blockY)
 
@@ -542,18 +542,19 @@ def checkFlags():
 	global flagsPlaced
 	global gameOver
 	global smileState
-
 	acceptableFlags = 0
+	
 
 	if bombCount - flagsPlaced == 0:
 		for blockY in range(ROWS):
 			for blockX in range(COLUMNS):
-					if coverField[blockY][blockX] == 2 and mineField[blockY][blockX] == 1:
-						acceptableFlags += 1
-		if acceptableFlags == bombCount:
+				if coverField[blockY][blockX] == 2 and mineField[blockY][blockX] == 1:
+					acceptableFlags += 1
+
+		if acceptableFlags == bombCount and not any(0 in sublist for sublist in coverField):
 			smileState = "Cool"
 			gameOver = True
-
+			
 
 #Set up mineFeild 
 placeBombs()
@@ -609,13 +610,12 @@ def gameLoop():
 
 		if smileState != "Cool": 
 			smileState = "Dead"
+			for blockY in range(9):
+				for blockX in range(9):
+				    uncoverBombs()
 
 		smileImgX = ((WIN_WIDTH / 2) - (26/2))
 		smileImgY = ((MARGIN) - (26/2)) + PADDING
-
-		for blockY in range(9):
-			for blockX in range(9):
-			    uncoverBombs()
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
