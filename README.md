@@ -1,6 +1,10 @@
 # Python Minesweeper
 Recreation of the classic Minesweeper game using Pygame.
 
-*Required:* Set up PyGame to run the code: https://stackoverflow.com/questions/28453854/add-pygame-module-in-pycharm-id
+Game started on ‎Tuesday, ‎July ‎16, ‎2019, ‏‎3:28:13 PM, finished on Friday, Febuary 14, 2020, 9:38:00 PM
 
-Troubles: 1) Only using local variables, had not learned what a global variable was at beginning. 2) The most difficult issue; uncovering multiple blocks at once (smoothly). My initial approach was to test surrounding blocks in daimond layers (up, down, left, right) outwards recursively, stopping before uncovering a bomb. This worked, but it was processing much to slowly to be functional. I took a break from this project after struggling to solve this problem. Later, when I began to work on other game mechanics, I added a timer. The timer needs to update regardless of user input, so it needed to be run in the 'while not gameOver' loop. That was the solution for uncovering the blocks: constantly update the cover blocks in the game loop. The blocks were uncovering slowly becuase it only updated if the cursor was being moved during the 'for event in pygame.event.get()'.
+>*Set up Pygame to run the code:* [Add Pygame](https://stackoverflow.com/questions/28453854/add-pygame-module-in-pycharm-id)
+  _____                              __          ______     __  __ 
+ / ___/__  __ _  __ _  ___ ____  ___/ /__ ____  / __/ /__  / /_/ / 
+/ /__/ _ \/  ' \/  ' \/ _ `/ _ \/ _  / -_) __/ _\ \/ / _ \/ __/ _ \
+\___/\___/_/_/_/_/_/_/\_,_/_//_/\_,_/\__/_/   /___/_/\___/\__/_//_/
