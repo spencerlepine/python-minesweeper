@@ -3,25 +3,8 @@ import sys
 import time
 import random
 import math
-#started on ‎Tuesday, ‎July ‎16, ‎2019, ‏‎3:28:13 PM"
 
-#https://www.reddit.com/r/SublimeText/comments/2mwb8u/quick_tip_sublime_text_clipboard_copy_paste/
-#TO-DO ------------------------------------------------------------
-#clean up code and label/explain stuff
-#add clicks and dissiapearing covers
-#automatically change touching block if clicked
-#maybe add second paremeter for touching blanks
-#make sure the middle four are always blank (ROWS/2)
-
-#draw seperate cover on top with flag and breakbable boolean
-#alwasy draw the bombs under
-#SEARCH FOR "HERES" and print + MAKe banner with epic epxlosions
-#change X-PADDING to just padding in code
-#remove dash in readme title
-#TEST CORNERS FOR LAYERING THING, leaving some baLNK
-#automatic flag if you win like 1 bomb?
-#fix flag image
-#-------------------------------------------------------------------
+#started on ‎Tuesday, ‎July ‎16, ‎2019, ‏‎3:28:13 PM, finished on Friday, Febuary 14, 2020, 9:38:00 PM
 
 #initiate program
 pygame.init()
@@ -29,43 +12,28 @@ pygame.init()
 #variables
 ROWS = 9
 COLUMNS = 9
-bombCount = 2
-flagsPlaced = 0
 TILE_SIZE = 16
 MARGIN = TILE_SIZE
 PADDING = 10
-X_PADDING = 10
 WIN_WIDTH = PADDING + (COLUMNS) * TILE_SIZE + PADDING
 WIN_HEIGHT = MARGIN + MARGIN + ((ROWS) * TILE_SIZE) + MARGIN + PADDING
 backgroud_colour = (255,255,255)
 
-#set up the game window
-gameDisplay = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-
-#window title
-pygame.display.set_caption('Minesweeper')
-
-#set up important clock
+#Set up important clock
 timeElapsed = 0
 clock = pygame.time.Clock()
 
-#draw backgrond onto the screen
-gameDisplay.fill(backgroud_colour)
-
-#set up mouse events
+#Set up mouse events
 cursorEvent = pygame.event.poll()
 
-#set up window icon
-#logo = pygame.image.load("Media/icon.png")
-#pygame.display.set_icon(logo)
-
-#game starts
+#Set game values
 gameOver = False
-
+bombCount = 10
+flagsPlaced = 0
 smileState = "Game"
 
-#load images
-coverImg = pygame.image.load("Media/block16.jpg")
+#Load images
+coverImg = pygame.image.load("Media/cover16.jpg")
 bombImg = pygame.image.load("Media/bomb16.jpg")
 endBombImg = pygame.image.load("Media/endbomb.jpg")
 noBombImg = pygame.image.load("Media/nobomb.jpg")
@@ -76,8 +44,6 @@ smileDownImg = pygame.image.load("Media/smile-down.jpg")
 smileOhNoImg = pygame.image.load("Media/smile-ohno.jpg")
 smileDeadImg = pygame.image.load("Media/smile-dead.jpg")
 smileCoolImg = pygame.image.load("Media/smile-cool.jpg")
-#bombsImg = pygame.image.load("Media/bomb16s.jpg")
-timesImg = pygame.image.load("Media/time.jpg")
 
 oneImg = pygame.image.load("Media/one.jpg")
 twoImg = pygame.image.load("Media/two.jpg")
@@ -93,7 +59,16 @@ zipImg = pygame.image.load("Media/zip.jpg")
 
 backgroundImg = pygame.image.load("Media/screenoutline.png")
 
-#MAX W and H is 16x30
+#Set up window
+gameDisplay = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+pygame.display.set_caption('Minesweeper')
+
+logo = pygame.image.load("Media/icon.jpg")
+pygame.display.set_icon(logo)
+
+#Draw backgrond onto the screen
+gameDisplay.fill(backgroud_colour)
+
 """mineField = [
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -117,6 +92,7 @@ backgroundImg = pygame.image.load("Media/screenoutline.png")
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ]"""
 
+#Define game arrays
 mineField = [
 [0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0],
@@ -128,6 +104,7 @@ mineField = [
 [0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0],
 ]
+
 touchingField = [
 [0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0],
@@ -152,23 +129,12 @@ coverField = [
 [0,0,0,0,0,0,0,0,0],
 ]
 
+#Set all variables to start values
 def initializeGame():
+
 	global ROWS
 	global COLUMNS
-	global bombCount
-	global TILE_SIZE
-	global MARGIN
-	global WIN_WIDTH
-	global WIN_HEIGHT
-	global backgroud_colour
-	global gameDisplay
-	global clock
-	global cursorEvent
 	global gameOver
-	global coverImg
-	global bombImg
-	global blankImg
-	global flagImg
 	global mineField
 	global touchingField
 	global coverField
@@ -176,36 +142,11 @@ def initializeGame():
 	global flagsPlaced
 	global timeElapsed
 
-	#variables
-	ROWS = 9
-	COLUMNS = 9
-	bombCount = 2#HERE PROBSBLY DON'T NEED
-
-	flagsPlaced = 0
-	#TILE_SIZE = 16
-	#MARGIN = TILE_SIZE
-	#WIN_WIDTH = MARGIN + COLUMNS * TILE_SIZE + MARGIN
-	#WIN_HEIGHT = MARGIN + MARGIN + ROWS * TILE_SIZE + MARGIN
-	#backgroud_colour = (255,255,255)
-
-	#set up mouse events
-	cursorEvent = pygame.event.poll()
-
-	#set up window icon
-	#logo = pygame.image.load("Media/icon.png")
-	#pygame.display.set_icon(logo)
-
+	#Return initial values
 	timeElapsed = 0
-
-	#game starts
 	gameOver = False
 	smileState = "Game"
-
-	"""#load images DO I NEED THESE?
-	coverImg = pygame.image.load("Media/block16.jpg")
-	bombImg = pygame.image.load("Media/bomb16.jpg")
-	blankImg = pygame.image.load("Media/blank16.jpg")
-	flagImg = pygame.image.load("Media/flag16.jpg")"""
+	flagsPlaced = 0
 
 	mineField = [
 	[0,0,0,0,0,0,0,0,0],
@@ -243,18 +184,20 @@ def initializeGame():
 	[0,0,0,0,0,0,0,0,0],
 	]
 
-	print("Restated variables")
-
+	#Generate a new minefield
 	placeBombs()
 
+	#Set up touchingFeild to display numbers
 	for blockY in range(ROWS):
 
 			for blockX in range(COLUMNS):
 
 				searchSurrounding(blockX, blockY)
 
+	#Run the game loop to start up the game
 	gameLoop()
 
+#Randomly place bombs in mineField[]
 def placeBombs():
 
 	tempBombCount = 0
@@ -274,17 +217,16 @@ def placeBombs():
 		for checkX in range(COLUMNS):
 
 			if mineField[checkY][checkX] == 1:
-				tempBombCount+=1
+				tempBombCount += 1
 				#print("placed a bomb")
 
 	#restart function until there are enough bombs
 	if tempBombCount < bombCount:
 		placeBombs()
 
-placeBombs()
-
-#set up text function
+#Set up text
 def textObjects(text, font, color):
+
 	textSurface = font.render(text, True, color)
 	return textSurface, textSurface.get_rect()
 
@@ -295,118 +237,132 @@ def textDisplay(text, x, y, color, type):
 
 		#numberText = pygame.font.Font("freesansbold.ttf", round(TILE_SIZE/2))
 		#numberText = pygame.font.Font("Media/digit-7-mono.ttf", round((TILE_SIZE/8)*7))
-		numberText = pygame.font.Font("Media/minesweeper.ttf", round(TILE_SIZE*(2/3)))
+		numberText = pygame.font.Font("Media/minesweeper.ttf", round(TILE_SIZE*(2/3)-1))
 		textSurf, textRect = textObjects(text, numberText, color)
 		#center the text
 		textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
 		gameDisplay.blit(textSurf, textRect)
 
-	"""elif type == "Digital": 
-
-		fontSize = 28
-		#numberText = pygame.font.Font("freesansbold.ttf", round(TILE_SIZE/2))
-		#numberText = pygame.font.Font("Media/digit-7-mono.ttf", round((TILE_SIZE/8)*7))
-		numberText = pygame.font.Font("Media/digit-7-mono.ttf", fontSize)
-		textSurf, textRect = textObjects(text, numberText, color)
-		#center the text
-		#textRect.center = (x + TILE_SIZE/2, y + TILE_SIZE/2)
-		textRect.center = (x, y + 10)
-		gameDisplay.blit(textSurf, textRect)"""
-
 def testSurrounding(cellColumn, cellRow):
-	#cellColumn, cellRow is the whole number of the array
 
 	#Uncover other blanks automatically
-	"""FIX BUG: After other blocks are uncovered, the game freezes trying to process the next layer"""
-	#for i in range(ROWS):
 	if mineField[cellRow][cellColumn] == 0 and touchingField[cellRow][cellColumn] == 0:
 
-		#if cellRow > 0 and cellColumn > 0 and coverField[cellRow-1][cellColumn-1] == 0:
-			#coverField[cellRow-1][cellColumn-1] = 1
-			#testSurrounding(cellColumn-1, cellRow-1, 0)
-
+		#Test if edges are uncoverable
 		if cellRow > 0 and coverField[cellRow-1][cellColumn] == 0:
+
 			coverField[cellRow-1][cellColumn] = 1
 			testSurrounding(cellColumn, cellRow-1)
 
-		#if cellColumn < COLUMNS-1 and cellRow > 0 and coverField[cellRow-1][cellColumn+1] == 0:
-		 	#coverField[cellRow-1][cellColumn+1] = 1
-		 	#testSurrounding(cellColumn+1, cellRow-1, 0)
-
 		if cellColumn > 0 and coverField[cellRow][cellColumn-1] == 0:
+
 		 	coverField[cellRow][cellColumn-1] = 1
 		 	testSurrounding(cellColumn-1, cellRow)
 
 		if cellColumn < COLUMNS-1 and coverField[cellRow][cellColumn+1] == 0:
+
 		 	coverField[cellRow][cellColumn+1] = 1
 		 	testSurrounding(cellColumn+1, cellRow)
 
-		#if cellRow < ROWS-1 and cellColumn > 1 and coverField[cellRow+1][cellColumn-1] == 0:
-		 	#coverField[cellRow+1][cellColumn-1] = 1
-		 	#testSurrounding(cellColumn-1, cellRow+1, 0)
-
 		if cellRow < ROWS-1 and coverField[cellRow+1][cellColumn] == 0:
+
 		 	coverField[cellRow+1][cellColumn] = 1
 		 	testSurrounding(cellColumn, cellRow+1)
 
-		#if cellRow < ROWS-1 and cellColumn < COLUMNS-1 and coverField[cellRow+1][cellColumn+1] == 0:
-		 	#coverField[cellRow+1][cellColumn+1] = 1
-		 	#testSurrounding(cellColumn+1, cellRow+1, 0)
+		#Test if corners are uncoverable
+		if cellRow > 0 and cellColumn > 0 and coverField[cellRow-1][cellColumn-1] == 0:
 
-		pygame.time.delay(6)
+			coverField[cellRow-1][cellColumn-1] = 1
+			testSurrounding(cellColumn-1, cellRow-1)
 
-def bombBlock(arrayCol, arrayRow, touchingBombs):
+		if cellColumn < COLUMNS-1 and cellRow > 0 and coverField[cellRow-1][cellColumn+1] == 0:
+
+			coverField[cellRow-1][cellColumn+1] = 1
+			testSurrounding(cellColumn+1, cellRow-1)			
+
+		if cellRow < ROWS-1 and cellColumn > 0 and coverField[cellRow+1][cellColumn-1] == 0:
+
+			coverField[cellRow+1][cellColumn-1] = 1
+			testSurrounding(cellColumn-1, cellRow+1)
+
+		if cellRow < ROWS-1 and cellColumn < COLUMNS-1 and coverField[cellRow+1][cellColumn+1] == 0:
+
+			coverField[cellRow+1][cellColumn+1] = 1
+			testSurrounding(cellColumn+1, cellRow+1)
+
+def bombBlock(arrayCol, arrayRow):
 
 	blockX = arrayCol * TILE_SIZE
 	blockY = arrayRow * TILE_SIZE
 
+	touchingBombs = str(touchingField[arrayRow][arrayCol])
+
 	#center game grid
-	blockX+=X_PADDING
-	blockY+=MARGIN*2 + PADDING*2
+	blockX += PADDING
+	blockY += MARGIN*2 + PADDING*2
 
 	blockType = "blank"
 
-	one = (0,90,255)
-	two = (65,175,65)
-	three = (188,6,0)
-	four = (116,0,188)
-	five = (60,0,104)
-	six = (255,0,0)
+	one = (0,0,255)
+	two = (0,123,0)
+	three = (255,0,0)
+	four = (0,0,123)
+	five = (123,0,0)
+	six = (0,123,123)
 	seven = (0,255,0)
-	eight = (0,0,0)
+	eight = (123,123,123)
 
 	#if cover == False:
 		#testSurrounding(arrayCol, arrayRow, touchingBombs, blockType)
 
 	if mineField[arrayRow][arrayCol] == 1:
+
 		blockType = "bomb"
 
 	touchingBombsLabel = str(touchingBombs)
 
 	if touchingBombsLabel == "1":
+
 		labelColor = one
+
 	elif touchingBombsLabel == "2":
+
 		labelColor = two
+
 	elif touchingBombsLabel == "3":
+
 		labelColor = three
+
 	elif touchingBombsLabel == "4":
+
 		labelColor = four
+
 	elif touchingBombsLabel == "5":
+
 		labelColor = five
+
 	elif touchingBombsLabel == "6":
+
 		labelColor = six
+
 	elif touchingBombsLabel == "7":
+
 		labelColor = seven
+
 	elif touchingBombsLabel == "8":
+
 		labelColor = eight
 
 	if blockType == "blank" and coverField[arrayRow][arrayCol] == 1:
+
 		gameDisplay.blit(blankImg, (blockX, blockY))
 
 		if touchingBombsLabel != "0" and coverField[arrayRow][arrayCol] == 1:
+
 			textDisplay(touchingBombsLabel, blockX, blockY, labelColor, "Block")
 
 	elif blockType == "bomb" and coverField[arrayRow][arrayCol] == 1:
+
 		gameDisplay.blit(bombImg, (blockX, blockY))
 		
 def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
@@ -421,8 +377,8 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 	blockY = arrayRow * TILE_SIZE
 
 	#center game grid
-	blockX+=X_PADDING
-	blockY+= PADDING*2 + MARGIN*2
+	blockX += PADDING
+	blockY += PADDING*2 + MARGIN*2
 
 	#if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 	mouseX, mouseY = pygame.mouse.get_pos()
@@ -436,15 +392,13 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 			if mouseY > blockY and mouseY < blockY + TILE_SIZE:
 
 				if coverField[arrayRow][arrayCol] == 0:
-					#print("Clicked cell: (" + str(arrayCol + 1) + ", " + str(arrayRow + 1) + ")")
+
 					coverField[arrayRow][arrayCol] = 1
 					testSurrounding(arrayCol, arrayRow)
 
 					if mineField[arrayRow][arrayCol] == 1:
-						#pygame.quit()
 
 						coverField[arrayRow][arrayCol] = 3
-						print("change to redde")
 
 						for bY in range(ROWS):
 
@@ -457,8 +411,6 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 
 						gameOver = "True"
 
-						"""HERE: DRAWs over 1's and cannot undo flag"""
-
 	if liftedMouse == True and mouseButton == "Right":
 
 		if mouseX > blockX and mouseX < blockX + TILE_SIZE:
@@ -466,14 +418,14 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 			if mouseY > blockY and mouseY < blockY + TILE_SIZE:
 
 				if coverField[arrayRow][arrayCol] == 0:
-					#print("Flaggeded cell: (" + str(arrayCol + 1) + ", " + str(arrayRow + 1) + ")")
+
 					coverField[arrayRow][arrayCol] = 2
-					flagsPlaced+=1
+					flagsPlaced += 1
 
 				elif coverField[arrayRow][arrayCol] == 2:
-					#print("Flaggeded cell: (" + str(arrayCol + 1) + ", " + str(arrayRow + 1) + ")")
+
 					coverField[arrayRow][arrayCol] = 0
-					flagsPlaced-=1
+					flagsPlaced -= 1
 
 	#if liftedMouse < 0:
 		#testMouse()
@@ -551,8 +503,6 @@ def decideDig(place, score):
 
 	global bombCount
 	global flagsPlaced
-
-	#print(score)
 
 	number = 0
 
@@ -657,8 +607,6 @@ def processBombCount():
 	gameDisplay.blit(decideDig(2, uncovered), (bombCountX + digitSpacing, bombCountY))
 	#digit 3
 	gameDisplay.blit(decideDig(3, uncovered), (bombCountX, bombCountY))
-	#print(decideDig(3, flagsPlaced))
-	#textDisplay(str(bombCount - flagsPlaced), blockX, blockY, (0,0,0), "Digital")
 
 def processTimer():
 
@@ -676,38 +624,6 @@ def processTimer():
 	gameDisplay.blit(decideDig(2,seconds), (timerX + digitSpacing, timerY))
 	#digit 3
 	gameDisplay.blit(decideDig(3,seconds), (timerX, timerY))
-	#print(decideDig(3, flagsPlaced))
-	#textDisplay(str(timer - flagsPlaced), blockX, blockY, (0,0,0), "Digital")
-
-def bombSearch(blockX,blockY):
-
-	touchingBombs = 0
-
-	if mineField[blockY-1][blockX-1] == 1 and blockY > 0 and blockX > 0:
-		touchingBombs+=1
-
-	if mineField[blockY-1][blockX] == 1 and blockY > 0:
-		touchingBombs+=1
-
-	if blockX < COLUMNS-1 and mineField[blockY-1][blockX+1] == 1 and blockY > 0:
-		touchingBombs+=1
-
-	if mineField[blockY][blockX-1] == 1 and blockX > 0:
-		touchingBombs+=1
-		
-	if blockX < COLUMNS-1 and mineField[blockY][blockX+1] == 1:
-		touchingBombs+=1
-		
-	if blockY < ROWS-1 and mineField[blockY+1][blockX-1] == 1 and blockX > 1:
-		touchingBombs+=1
-		
-	if blockY < ROWS-1 and mineField[blockY+1][blockX] == 1 :
-		touchingBombs+=1
-		
-	if blockY < ROWS-1 and blockX < COLUMNS-1 and mineField[blockY+1][blockX+1] == 1:
-		touchingBombs+=1
-
-	return touchingBombs
 	
 def searchSurrounding(blockX,blockY):
 
@@ -731,40 +647,35 @@ def searchSurrounding(blockX,blockY):
 
 		touchingField[blockY][blockX] += 1		
 
-	if blockY < ROWS-1 and mineField[blockY+1][blockX-1] == 1 and blockX > 1:
+	if blockY < ROWS-1 and mineField[blockY+1][blockX-1] == 1 and blockX > 0:
 
-		touchingField[blockY][blockX] += 1		
+		touchingField[blockY][blockX] += 1
+
 	if blockY < ROWS-1 and mineField[blockY+1][blockX] == 1 :
 
 		touchingField[blockY][blockX] += 1	
-
 
 	if blockY < ROWS-1 and blockX < COLUMNS-1 and mineField[blockY+1][blockX+1] == 1:
 
 		touchingField[blockY][blockX] += 1
 
-
-for blockY in range(ROWS):
-
-		for blockX in range(COLUMNS):
-
-			searchSurrounding(blockX, blockY)
-
+#Draw the blocks
 def processAllCells(mouseStatus, whichMouseButton):
 
+	global ROWS
+	global COLUMNS
 	
-
 	for blockY in range(ROWS):
 
 		for blockX in range(COLUMNS):
 
 			checkFlags()
 			coverBlock(blockX, blockY, mouseStatus, whichMouseButton)
-			bombBlock(blockX, blockY, bombSearch(blockX, blockY))
-
+			bombBlock(blockX, blockY)
 	processBombCount()
 	processTimer()
-	
+
+#Explode bombs after death	
 def uncoverBombs():
 
 	global COLUMNS
@@ -782,8 +693,9 @@ def uncoverBombs():
 				if coverField[blockY][blockX] < 2:
 
 					coverField[blockY][blockX] = 1
-					bombBlock(blockX, blockY, bombSearch(blockX, blockY))
+					bombBlock(blockX, blockY)
 
+#Pause the game if user wins
 def checkFlags():
 
 	global bombCount
@@ -801,34 +713,33 @@ def checkFlags():
 
 					if coverField[blockY][blockX] == 2 and mineField[blockY][blockX] == 1:
 
-						acceptableFlags+=1
-
-					#elif coverField[blockY][blockX] == 2 and mineField[blockY][blockX] == 1:
-
-						#coverField[blockY][blockX] == 4
-						#print("changed to 4")
+						acceptableFlags += 1
 
 		if acceptableFlags == bombCount:
 
 			smileState = "Cool"
 			gameOver = True
-			
+
+#Set up mineFeild 
+placeBombs()
+
+#SEt up touchingField for number labels
+for blockY in range(ROWS):
+
+		for blockX in range(COLUMNS):
+
+			searchSurrounding(blockX, blockY)
+
+#Main loop
 def gameLoop():
 
 	global gameOver
 	global smileState
-	mouseX, mouseY = pygame.mouse.get_pos()#MAKE GLOBAL
-
 	global timeElapsed
-	"""smileImgX = ((WIN_WIDTH / 2) - (26/2))
-	smileImgY = ((MARGIN) - (26/2))
-
-	mouseX, mouseY = pygame.mouse.get_pos()"""
-	
+	mouseX, mouseY = pygame.mouse.get_pos()#MAKE GLOBAL
 
 	while not gameOver: 
 		
-		#timeElapsed+=0.1
 		liftedMouse = False
 		mouseButton = "Left"
 		mouseDown = False
@@ -840,12 +751,6 @@ def gameLoop():
 				pygame.quit()
 				quit()
 
-			"""if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-			    
-			    liftedMouse = False
-			    mouseButton = "Left"
-
-			 """
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 
 				mouseDown = True
@@ -866,16 +771,14 @@ def gameLoop():
 		processSmiley(mouseDown, liftedMouse, smileState)    
 
 		gameDisplay.blit(backgroundImg, (0, 0))
-		#blockCover = True
 
 		pygame.display.update()
 
-		#pygame.event.wait()
 		
 		clock.tick(60)
-		timeElapsed+=16.66676
-		#print(str(round(timeElapsed/1000)) + " --- " + str(int(round(pygame.time.get_ticks()/1000))))
+		timeElapsed += 16.66676
 
+	#Puase game, wait for restart
 	while gameOver: 
 		
 		liftedMouse = False
@@ -894,11 +797,8 @@ def gameLoop():
 		for event in pygame.event.get():
 
 			if event.type == pygame.QUIT:
-				#gameOver = True
 				pygame.quit()
 				quit()
-
-			
 
 			if mouseX > smileImgX and mouseX < smileImgX + 26:
 
@@ -912,17 +812,7 @@ def gameLoop():
 			    
 			    liftedMouse = True
 
-			    """if mouseX > smileImgX and mouseX < smileImgX + 26:
-
-			    	if mouseY > smileImgY and mouseY < smileImgY + 26:
-			    		initializeGame()"""
-
 			processSmiley(mouseDown, liftedMouse, smileState)
-			    
-			#if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-			    
-			    #print("Restarting program")
-			    #initializeGame()
 
 		pygame.display.update()
 
