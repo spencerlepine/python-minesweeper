@@ -26,7 +26,7 @@ cursorEvent = pygame.event.poll()
 
 #Define game variables.
 gameOver = False
-bombCount = 3
+bombCount = 10
 flagsPlaced = 0
 smileState = "Game"
 
