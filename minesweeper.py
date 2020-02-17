@@ -579,7 +579,7 @@ def gameLoop():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-				quit()
+				sys.exit()
 
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				mouseDown = True
@@ -620,7 +620,7 @@ def gameLoop():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-				quit()
+				sys.exit
 
 			if mouseX > smileImgX and mouseX < smileImgX + 26:
 				if mouseY > smileImgY and mouseY < smileImgY + 26:	
