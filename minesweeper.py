@@ -321,7 +321,7 @@ def bombBlock(arrayCol, arrayRow):
 
 
 #Draw the cover, flag, or no image based on the given mineField	index.
-def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
+def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton, mouseDown):
 	global gameOver
 	global smileState
 	global flagsPlaced
@@ -338,9 +338,10 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 	mouseX, mouseY = pygame.mouse.get_pos()
 
 	#Test if the mouse is clicked within cell coordinates.
-	if liftedMouse == True and mouseButton == "Left":
-		if mouseX > blockX and mouseX < blockX + TILE_SIZE:
-			if mouseY > blockY and mouseY < blockY + TILE_SIZE:
+	if mouseX > blockX and mouseX < blockX + TILE_SIZE:
+		if mouseY > blockY and mouseY < blockY + TILE_SIZE:
+				
+			if liftedMouse == True and mouseButton == "Left":
 				if coverField[arrayRow][arrayCol] == 0:
 					coverField[arrayRow][arrayCol] = 1
 					testSurrounding(arrayCol, arrayRow)
@@ -353,15 +354,14 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 									coverBlock(bX, bY, liftedMouse, mouseButton)
 						gameOver = "True"
 
-	if liftedMouse == True and mouseButton == "Right":
-		if mouseX > blockX and mouseX < blockX + TILE_SIZE:
-			if mouseY > blockY and mouseY < blockY + TILE_SIZE:
+			if liftedMouse == True and mouseButton == "Right":
 				if coverField[arrayRow][arrayCol] == 0:
 					coverField[arrayRow][arrayCol] = 2
 					flagsPlaced += 1
 				elif coverField[arrayRow][arrayCol] == 2:
 					coverField[arrayRow][arrayCol] = 0
 					flagsPlaced -= 1
+
 
 	if coverField[arrayRow][arrayCol] == 0 and coverField[arrayRow][arrayCol] != 1:
 		gameDisplay.blit(coverImg, (blockX, blockY))
@@ -372,6 +372,7 @@ def coverBlock(arrayCol, arrayRow, liftedMouse, mouseButton):
 		gameDisplay.blit(endBombImg, (blockX, blockY))
 	elif coverField[arrayRow][arrayCol] == 4:
 		gameDisplay.blit(noBombImg, (blockX, blockY))
+
 
 
 #Draw the proper smiley face image depending on the current smileState.
@@ -509,21 +510,30 @@ def searchSurrounding(blockX,blockY):
 
 
 #Draw the array of sprites, update the bomb counter, and update the timer.
-def processAllCells(mouseStatus, whichMouseButton):
+def processAllCells(mouseStatus, whichMouseButton, mouseDown):
 	global ROWS
 	global COLUMNS
 	
 	for blockY in range(ROWS):
 		for blockX in range(COLUMNS):
 			checkFlags()
-			coverBlock(blockX, blockY, mouseStatus, whichMouseButton)
+			coverBlock(blockX, blockY, mouseStatus, whichMouseButton, mouseDown)
 			bombBlock(blockX, blockY)
 
 	processBombCount()
 	processTimer()
 
+#Draw a blank tile to indicate user click.
+def drawBlank(x,y, mouseDown):
+	if mouseDown and x > PADDING and x < WIN_WIDTH-PADDING and y > (PADDING*2 + MARGIN*2) and y < WIN_HEIGHT-PADDING:
+		X_DIFF = (x - (PADDING)) % TILE_SIZE
+		# PADDING*2 + MARGIN*2
+		Y_DIFF = (y - (PADDING*2 + MARGIN*2)) % TILE_SIZE
+		gameDisplay.blit(blankImg, (x - X_DIFF, y - Y_DIFF))
+		# //
+				# gameDisplay.blit(blankImg, (mouseX, mouseY))
 
-#Explode bombs after death	
+#Explode bombs after death.
 def uncoverBombs():
 	global COLUMNS
 	global ROWS
@@ -569,34 +579,39 @@ def gameLoop():
 	global gameOver
 	global smileState
 	global timeElapsed
-	mouseX, mouseY = pygame.mouse.get_pos()
+	mouseDown = False
 
 	while not gameOver: 
 		liftedMouse = False
-		mouseButton = "Left"
-		mouseDown = False
+		mouseButton = None
+		
+		mouseX, mouseY = pygame.mouse.get_pos()
+
+		gameDisplay.blit(backgroundImg, (0, 0))
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-				sys.exit()
-
+				sys.exit() 
+			
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				mouseDown = True
 				smileState = "OhNo"
 
 			if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-			    liftedMouse = True
-			    mouseButton = "Left"
-			    smileState = "Game"
+				mouseDown = False
+				liftedMouse = True
+				mouseButton = "Left"
+				smileState = "Game"
 			elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
 			    liftedMouse = True
 			    mouseButton = "Right"
+			    mouseDown = False
 
-		processAllCells(liftedMouse, mouseButton)
+		processAllCells(liftedMouse, mouseButton, mouseDown)
 		processSmiley(mouseDown, liftedMouse, smileState)    
 
-		gameDisplay.blit(backgroundImg, (0, 0))
+		drawBlank(mouseX, mouseY, mouseDown)
 
 		pygame.display.update()
 
